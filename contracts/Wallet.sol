@@ -19,9 +19,19 @@ contract Wallet {
     Transfer[] public transfers;
     mapping(address => mapping(uint => bool)) approvals;
 
+    event TransferCreated(
+        address indexed _from,
+        address indexed _to,
+        uint _amount
+    );
+
     constructor(address[] memory _approvers, uint _quorum) public {
         approvers = _approvers;
         quorum = _quorum;
+    }
+
+    function getApprovals(uint _id) external view returns(bool) {
+        return approvals[msg.sender][_id];
     }
 
     function getApprovers() external view returns(address[] memory) {
@@ -36,6 +46,8 @@ contract Wallet {
             0,
             false
         ));
+
+        emit TransferCreated(msg.sender, _to, _amount);
 
         //nextId++;
     }

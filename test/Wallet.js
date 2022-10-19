@@ -1,5 +1,5 @@
 // const { assert } = require("console");
-const { expectRevert } = require('@openzeppelin/test-helpers');
+const { expectRevert, expectEvent, BN } = require('@openzeppelin/test-helpers');
 //const { web3 } = require('@openzeppelin/test-helpers/src/setup');
 
 const Wallet = artifacts.require("Wallet.sol");
@@ -30,7 +30,12 @@ contract('Wallet', async (accounts) => {
   });
 
   it('test create transfer', async () => {
-    await wallet.createTransfers(accounts[4], 100, { from: accounts[0]});
+    var receipt = await wallet.createTransfers(accounts[4], 100, { from: accounts[0]});
+    expectEvent(receipt, 'TransferCreated', {
+      _from: accounts[0],
+      _to: accounts[4],
+      _amount: new BN(100)
+    });
     const transfers = await wallet.getTransfers();
     assert(transfers.length, 1, 'has a transfer');
     var theTransfer = transfers[0];
@@ -48,9 +53,12 @@ contract('Wallet', async (accounts) => {
     );
   });
 
-  it('should increment approval', async () => {
+  it.only('should increment approval', async () => {
     await wallet.createTransfers(accounts[5], 100, { from: accounts[0]});
     await wallet.approveTransfer(0, { from: accounts[0]});
+
+    const isApproved = await wallet.getApprovals(0, { from: accounts[0]});
+    assert(isApproved == true, "should be approved");
 
     const transfers = await wallet.getTransfers();
     var theTransfer = transfers[0];
@@ -100,5 +108,6 @@ contract('Wallet', async (accounts) => {
       'transfer has already been sent'
     );
   });
+
 
 });
