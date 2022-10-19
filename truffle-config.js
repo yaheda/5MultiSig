@@ -20,6 +20,9 @@
 
 const path = require("path");
 
+const { projectId, mnemonic, keys } = require('./secrets.json');
+const HDWalletProvider = require('@truffle/hdwallet-provider');
+
 // const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
 //
@@ -51,6 +54,16 @@ module.exports = {
      port: 7545,            // Standard Ethereum port (default: none)
      network_id: "*",       // Any network (default: none)
     },
+
+    goerli: {
+      provider: () => new HDWalletProvider(
+        keys, 
+        `https://goerli.infura.io/v3/${projectId}`,
+        0,
+        3), // from 0 to 3
+      network_id: 5,     // Goerli's id
+      gas: 7500000,
+    }
 
     // Another network with more advanced options...
     // advanced: {
